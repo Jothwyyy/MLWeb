@@ -2,12 +2,35 @@ import web
 import csv
 import io
 
+import pandas as pd
+
 render = web.template.render('app/views', base='template')
 
 class Index:
 
     def __init__(self):
         pass
+
+    def info(self):
+        ruta_archivo = f"static/csv/archivo.csv"
+        df = pd.read_csv(ruta_archivo)
+
+        informacion = {
+            "shape": df.shape,
+            "dtype": df.dtypes
+        }
+        return informacion
+
+    def estadistica_descriptiva(self):
+        ruta_archivo = f"static/csv/archivo.csv"
+
+        df = pd.read_csv(ruta_archivo)
+
+        return {
+            "cantidad_filas": len(df)
+
+        }
+ 
 
     def GET(self):
         return render.index()
@@ -33,9 +56,12 @@ class Index:
 
         respuesta = f"Archivo {nombre_csv} recibido. filas: {len(filas)}"
 
-        ruta_archivo = f"static/csv/{nombre_csv}"
+        ruta_archivo = f"static/csv/archivo.csv"
         with open(ruta_archivo, mode="w", newline="", encoding="utf-8") as archivo:
             escritor = csv.writer(archivo)
             escritor.writerow(filas)
 
-        return respuesta
+        # Llamamos al metodo info que utiliza pandas para analizar el csv
+        csv_info = self.info()
+
+        return csv_info
